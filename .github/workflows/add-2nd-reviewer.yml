@@ -52,7 +52,6 @@ jobs:
           fi
 
           echo "Related Repository: $RELATED_REPO"
-          echo "related_repo=$RELATED_REPO" >> $GITHUB_OUTPUT
 
           # Make an API call to retrieve the most recently updated, open PR.
           PR_INFO=$(curl -s -H \
@@ -61,9 +60,10 @@ jobs:
             "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc" | jq '.[0]')
 
           REVIEWERS_COUNT=$("$PR_INFO" | jq '.requested_reviewers | length')
+          echo "$REVIEWERS_COUNT requested reviewers in $RELATED_REPO"
 
           if [[ $REVIEWERS_COUNT -gt 1 ]]; then
-            SECOND_REVIEWER=$("$PR_INFO" | jq -r '.requested_reviewers[1].login')
+            SECOND_REVIEWER=$("$PR_INFO" | jq '.requested_reviewers' | jq '.[1].login')
           else
             SECOND_REVIEWER="dbt"
           fi
