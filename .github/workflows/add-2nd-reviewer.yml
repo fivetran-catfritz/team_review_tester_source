@@ -55,11 +55,10 @@ jobs:
           echo "related_repo=$RELATED_REPO" >> $GITHUB_OUTPUT
 
           # Make an API call to retrieve the most recently updated, open PR.
-          PR_INFO=$(curl -s \
+          PR_INFO=$(curl -s -H \
             -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc" | \
-            jq ".[0]")
+            "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc" | jq '.[0]')
 
           if [[ "$PR_INFO" | jq '.requested_reviewers | length' -gt 1 ]]; then
             SECOND_REVIEWER=$(echo "$PR_INFO" | jq -r '.requested_reviewers[1].login')
