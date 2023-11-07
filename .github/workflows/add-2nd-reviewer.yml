@@ -57,13 +57,13 @@ jobs:
           PR_INFO=$(curl -s -H \
             -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc" | jq '.[0]')
+            "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc" | jq '.[0].requested_reviewers')
 
-          REVIEWERS_COUNT=$("$PR_INFO" | jq '.requested_reviewers | length')
+          REVIEWERS_COUNT=$("$PR_INFO" | jq 'length')
           echo "$REVIEWERS_COUNT requested reviewers in $RELATED_REPO"
 
           if [[ $REVIEWERS_COUNT -gt 1 ]]; then
-            SECOND_REVIEWER=$("$PR_INFO" | jq '.requested_reviewers' | jq '.[1].login')
+            SECOND_REVIEWER=$("$PR_INFO" | jq '.[1].login')
           else
             SECOND_REVIEWER="dbt"
           fi
@@ -83,5 +83,4 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/requested_reviewers \
             -d "{\"team_reviewers\":[\"$SECOND_REVIEWER\"]}"
             )
-          echo "$RESPONSE"
           echo "$RESPONSE"
