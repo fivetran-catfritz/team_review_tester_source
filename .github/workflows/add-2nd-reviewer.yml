@@ -84,3 +84,4 @@ jobs:
             -d "{\"team_reviewers\":[\"$SECOND_REVIEWER\"]}"
             )
           echo "$RESPONSE"
+          echo "$RESPONSE"
