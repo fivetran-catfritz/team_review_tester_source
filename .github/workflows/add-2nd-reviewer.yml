@@ -54,17 +54,14 @@ jobs:
           echo "Related Repository: $RELATED_REPO"
           echo "related_repo=$RELATED_REPO" >> $GITHUB_OUTPUT
 
-          # Calculate the start date for the past week (7 days ago).
-          START_DATE=$(date -I -d "7 days ago")
-
-          # Make an API call to retrieve approved PRs from the related repository in the past week.
+          # Make an API call to retrieve the most recently updated, open PR.
           PR_INFO=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc&since=$START_DATE" | \
-            jq "map(select(.requested_reviewers | length >= 2)) | .[0]")
+            "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc" | \
+            jq ".[0]")
 
-          if [[ -n "$PR_INFO" ]]; then
+          if [[ "$PR_INFO" | jq '.requested_reviewers | length' -gt 1 ]]; then
             SECOND_REVIEWER=$(echo "$PR_INFO" | jq -r '.requested_reviewers[1].login')
           else
             SECOND_REVIEWER="dbt"
