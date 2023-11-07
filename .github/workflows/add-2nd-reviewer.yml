@@ -60,7 +60,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$RELATED_REPO/pulls?state=open&sort=updated&direction=desc" | jq '.[0]')
 
-          REVIEWERS_COUNT = $($PR_INFO jq '.requested_reviewers | length')
+          REVIEWERS_COUNT=$($PR_INFO jq '.requested_reviewers | length')
 
           if [[ $REVIEWERS_COUNT -gt 1 ]]; then
             SECOND_REVIEWER=$(echo "$PR_INFO" | jq -r '.requested_reviewers[1].login')
